@@ -5,6 +5,14 @@
     <ApplicationIcon />
     <OutputType>Library</OutputType>
     <StartupObject />
+    <IsPackable>true</IsPackable>
+    <PackageId>BB74.RoleDb</PackageId>
+    <Authors>Bert Bruggeman</Authors>
+    <PackageTags>netcore3 angular netcore identity</PackageTags>
+    <PackageProjectUrl>https://github.com/Bert1974/netcore3/tree/master/RoleDb</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/Bert1974/netcore3/tree/master/RoleDb</RepositoryUrl>
+    <RepositoryType>GIT</RepositoryType>
+    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
   </PropertyGroup>
 
   <ItemGroup>
