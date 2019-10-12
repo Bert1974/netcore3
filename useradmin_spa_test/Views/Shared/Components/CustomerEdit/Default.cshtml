@@ -1,0 +1,9 @@
+﻿@model useradmin.ViewModels.CustomerInfo
+<form action="@Url.ActionLink("SaveCustomer", "RoleEdit")" method="POST">
+    @Html.AntiForgeryToken()
+    <input type="hidden" name="Id" value="@Model.Customer.Id" />
+    <input type="hidden" name="ReturnURL" value="@Model.ReturnURL" />
+    <label class="control-label">@Model.Role</label>
+    <input type="text" name="Location" value="@Model.Customer.Location">
+    <button type="submit">Set</button>
+</form>

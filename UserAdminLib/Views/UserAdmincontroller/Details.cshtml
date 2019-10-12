@@ -1,0 +1,138 @@
+﻿@model RolesWithData<UserInfo>
+@{
+    ViewData["Title"] = "User details";
+}
+@section Scripts {
+    <link rel="stylesheet" href="/useradmin/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="/useradmin/css/site.css" />
+    <script src="/useradmin/lib/jquery/dist/jquery.min.js"></script>
+    <script src="/useradmin/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+}
+
+<div class="row boxit">
+    <div class="col-md-12">
+        <form asp-action="Search" method="post">
+            <label class="control-label">Search name/email:</label>
+            <input type="text" name="username" class="form-control  input-lg">
+        </form>
+    </div>
+</div>
+<div class="row boxit mt-3">
+    <div class="col-md-12">
+        <table class='table table-striped'>
+            <tr>
+                <td>
+                    <label class="control-label">name</label>
+                </td>
+                <td>
+                    <form asp-action="Set" method="POST">
+                        <input type="hidden" name="id" value="@Model.Data.Id" />
+                        <input type="hidden" name="set" value="username" />
+                        <div class="form-group">
+                            <input type="text" name="UserName" class="form-control" readonly value="@Model.Data.UserName" />
+                        </div>
+                    </form>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <label class="control-label">email</label>
+                </td>
+                <td>
+                    <form asp-action="Set" method="POST">
+                        <input type="hidden" name="id" value="@Model.Data.Id" />
+                        <input type="hidden" name="set" value="username" />
+                        <div class="form-group">
+                            <input type="text" name="Email" class="form-control" value="@Model.Data.Email" />
+                            <button type="submit">Set</button>
+                        </div>
+                    </form>
+                    <form asp-action="Set" method="POST">
+                        <input type="hidden" name="id" value="@Model.Data.Id" />
+                        <input type="hidden" name="set" value="setemailconfirmed" />
+                        <div class="form-group">
+                            <label class="control-label">Email-confirmed</label>
+                            <input type="checkbox" name="EmailConfirmed" size="60" disabled checked="@Model.Data.EmailConfirmed" />
+                        </div>
+                    </form>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <label class="control-label">Security</label>
+                </td>
+                <td>
+                    <form asp-action="Set" method="POST">
+                        <input type="hidden" name="id" value="@Model.Data.Id" />
+                        <input type="hidden" name="set" value="reset_twofactor" />
+                        <div class="form-group">
+                            <label class="control-label">Two factor enabled</label>
+                            <input type="checkbox" name="value" disabled checked="@Model.Data.TwoFactorEnabled" />
+                        </div>
+                    </form>
+                    <form asp-action="Set" method="POST">
+                        <input type="hidden" name="id" value="@Model.Data.Id" />
+                        <input type="hidden" name="set" value="reset_lockout" />
+                        <div class="form-group">
+                            <label class="control-label">lock out enabled</label>
+                            <input type="checkbox" name="value" disabled checked="@Model.Data.LockoutEnabled" />
+                        </div>
+                    </form>
+                </td>
+            </tr>
+            @if (Model.Data.IsAdmin.HasValue)
+            {
+                <tr>
+                    <td>
+                        <label class="control-label">Roles</label>
+                    </td>
+                    <td>
+                        <form asp-action="Set" method="POST">
+                            <input type="hidden" name="id" value="@Model.Data.Id" />
+
+                            <label class="control-label">@Constants.Role</label>
+                            <input type="checkbox" name="doadmin" checked="@Model.Data.IsAdmin.Value">
+                            <button type="submit" name="submit" value="save_admin">Set</button>
+                        </form>
+                    </td>
+                </tr>
+            }
+            @if (Model.Roles != null)
+            {
+                if (Model.Roles.Length > 0)
+                {
+                    <tr>
+                        <td>
+                            <label class="control-label">Roles</label>
+                        </td>
+                        <td>
+                            <form asp-action="Set" method="POST">
+                                <input type="hidden" name="id" value="@Model.Data.Id" />
+                                @foreach (string role in Model.Roles)
+                                {
+                                    if ((!Model.Data.IsAdmin.HasValue) || role != Constants.Role)
+                                    {
+                                        <label class="control-label">@role</label>
+                                        <input type="checkbox" name="role_@role" checked="@Model.Data.Roles.Contains(role)">
+                                    }
+                                }
+                                <button type="submit" name="submit" value="set_roles">Set</button>
+                            </form>
+                        </td>
+                    </tr>
+                }
+                @foreach (var handler in Model.Data.RoleHandlers)
+                {
+                    <tr>
+                        <td>
+                            <label class="control-label">@handler.Name</label>
+                        </td>
+                        <td>
+                            @await Component.InvokeAsync(handler.ViewComponent, new { id = Model.Data.Id, handler = handler, returnurl = new Uri(Url.ActionLink("Details", values: new { id = Model.Data.Id })).PathAndQuery })
+                        </td>
+                    </tr>
+                }
+            }
+        </table>
+    </div>
+</div>
