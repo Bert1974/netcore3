@@ -38,6 +38,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\RoleDb\RoleDb.csproj" />
     <ProjectReference Include="..\UserAdminLib\UserAdminLib.csproj" />
   </ItemGroup>
 

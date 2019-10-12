@@ -7,6 +7,14 @@
     <StartupObject />
     <GenerateEmbeddedFilesManifest>true</GenerateEmbeddedFilesManifest>
     <RootNamespace>UserAdminLib</RootNamespace>
+    <IsPackable>true</IsPackable>
+    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+    <PackageProjectUrl>https://github.com/Bert1974/netcore3/tree/master/UserAdminLib</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/Bert1974/netcore3/tree/master/UserAdminLib</RepositoryUrl>
+    <RepositoryType>GIT</RepositoryType>
+    <PackageTags>netcore3 angular netcore identity</PackageTags>
+    <Authors>Bert Bruggeman</Authors>
+    <PackageId>BB74.UserAdminLib</PackageId>
   </PropertyGroup>
 
 
