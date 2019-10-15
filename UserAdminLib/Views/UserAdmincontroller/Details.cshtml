@@ -25,13 +25,7 @@
                     <label class="control-label">name</label>
                 </td>
                 <td>
-                    <form asp-action="Set" method="POST">
-                        <input type="hidden" name="id" value="@Model.Data.Id" />
-                        <input type="hidden" name="set" value="username" />
-                        <div class="form-group">
-                            <input type="text" name="UserName" class="form-control" readonly value="@Model.Data.UserName" />
-                        </div>
-                    </form>
+                    <input type="text" readonly class="form-control" value="@Model.Data.UserName" />
                 </td>
             </tr>
             <tr>
@@ -41,10 +35,9 @@
                 <td>
                     <form asp-action="Set" method="POST">
                         <input type="hidden" name="id" value="@Model.Data.Id" />
-                        <input type="hidden" name="set" value="username" />
                         <div class="form-group">
                             <input type="text" name="Email" class="form-control" value="@Model.Data.Email" />
-                            <button type="submit">Set</button>
+                            <button type="submit" name="submit" value="setemail">Set</button>
                         </div>
                     </form>
                     <form asp-action="Set" method="POST">
@@ -121,7 +114,7 @@
                         </td>
                     </tr>
                 }
-                @foreach (var handler in Model.Data.RoleHandlers)
+                @foreach (var handler in Model.Data.RoleHandlers.Where(_h => _h.ViewComponent != null))
                 {
                     <tr>
                         <td>

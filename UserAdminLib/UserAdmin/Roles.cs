@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Microsoft.AspNetCore.Identity;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -19,9 +20,10 @@ namespace UserAdminLib.Roles
     }/// <summary>
      /// added with  builder.Services.AddSingleton by UserAdminLib.UserAdminExtensions
      /// </summary>
-    public interface IRoleSingleton
+    public interface IRoleSingleton<TRole>
+        where TRole : IdentityRole<string>
     {
-        public IRoleHandler Get(string role);
+        public IRoleHandler Get(string normalizedRoleName);
     }
     #endregion
 

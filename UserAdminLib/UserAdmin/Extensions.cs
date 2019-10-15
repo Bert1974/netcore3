@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.AspNetCore.Mvc.ApplicationParts;
 using Microsoft.AspNetCore.Mvc.Controllers;
 using Microsoft.EntityFrameworkCore;
@@ -16,6 +17,7 @@ using System.Linq;
 using System.Reflection;
 using System.Security.Claims;
 using System.Threading.Tasks;
+using UserAdminLib.Configuration;
 
 namespace UserAdminLib
 {
@@ -100,6 +102,21 @@ namespace UserAdminLib
         }
         #endregion
 
+        public static async Task SyncUserAdmin<TUser, TRole, TContext>(this IServiceProvider services) where TUser : IdentityUser<string>, new() where TRole : IdentityRole<string> where TContext : DbContext
+        {
+            var options = services.GetRequiredService<IOptions<UserAdminOptions>>().Value;
+
+            if (options.Field == null)
+            {
+                var roles = services.GetRequiredService<RoleManager<TRole>>();
+
+                if (await roles.FindByNameAsync(Constants.Role) ==null)
+                {
+                    var role = (TRole)Activator.CreateInstance(typeof(TRole), new object[] { Constants.Role });
+                    await roles.CreateAsync(role);
+                }
+            }
+        }
         /// <summary>
         /// Make the UserAdminController available to MVC as Controller
         /// </summary>
@@ -168,9 +185,9 @@ namespace UserAdminLib
                     {
                         policy.AuthenticationSchemes.Add(Constants.Scheme);
                         policy.RequireAuthenticatedUser();
-                        policy.RequireRole(Constants.Role);
+                     //   policy.RequireRole(Constants.Role);
 
-                        configurefunc?.Invoke(policy);
+                            configurefunc?.Invoke(policy);
                     });
             });
         }

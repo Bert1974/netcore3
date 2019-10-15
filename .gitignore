@@ -1,0 +1,6 @@
+﻿################################################################################
+# This .gitignore file was automatically created by Microsoft(R) Visual Studio.
+################################################################################
+
+/useradmin_spa_test/appsettings.Development.json
+/useradmin_mvc_test/appsettings.Development.json

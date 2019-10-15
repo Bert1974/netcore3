@@ -27,7 +27,7 @@
                     <tr>
                         <th>Name</th>
                         <th>EMail</th>
-                        <th>Lockedout</th>
+                        <th>Roles</th>
                     </tr>
                 </thead>
                 @foreach (var u in Model.Data)
@@ -35,11 +35,15 @@
                     <tr>
                         <td>@u.UserName</td>
                         <td>@u.Email</td>
-                        <td>@u.LockoutEnabled</td>
+                        <td>@string.Join(",",u.Roles)</td>
                         <td>
                             <form asp-action="Details" method="post">
                                 <input type="hidden" name="id" value="@u.Id" />
-                                <button type="submit">Details</button>
+                                <button type="submit" name="submit" value="Details">Details</button>
+                            </form>
+                            <form asp-action="Remove" method="post">
+                                <input type="hidden" name="id" value="@u.Id" />
+                                <button type="submit">Remove</button>
                             </form>
 
                         </td>

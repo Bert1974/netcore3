@@ -7,9 +7,11 @@ using Microsoft.AspNetCore.Mvc.ApplicationModels;
 using Microsoft.AspNetCore.Mvc.Routing;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
+using Microsoft.Extensions.Primitives;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using UserAdminLib.Configuration;
 using UserAdminLib.ViewModels;
@@ -46,11 +48,10 @@ namespace UserAdminLib
 
         internal static void SetURL(Type controllertype, string url)
         {
-            if (lookup.Count != 1)
+            if (lookup.Count == 1)
             {
-                throw new NotImplementedException();
+                lookup[lookup.Keys.Single()] = url;
             }
-            lookup[lookup.Keys.Single()] = url;
         }
     }
 }
@@ -58,7 +59,7 @@ namespace UserAdminLib.Controllers
 {
     [Route("[controller]")]
     [GenericControllerNameConvention()]
-    [Authorize(Policy = Constants.Policy)]
+    [Authorize(Policy = Constants.Policy, Roles =Constants.Role)]
     public class UserAdminBaseController<TUser, TRole, TKey, TContext> : Controller
         where TUser : IdentityUser<TKey>
         where TRole : IdentityRole<TKey>
@@ -68,12 +69,34 @@ namespace UserAdminLib.Controllers
         protected readonly Configuration.UserAdminOptions _options;
         protected readonly UserManager<TUser> _users;
         protected readonly TContext _context;
+        private readonly RoleManager<TRole> _roles;
 
-        public UserAdminBaseController(TContext context, IOptions<Configuration.UserAdminOptions> options, UserManager<TUser> users)
+        public UserAdminBaseController(TContext context, IOptions<Configuration.UserAdminOptions> options, UserManager<TUser> users, RoleManager<TRole> roles)
         {
             _options = options.Value;
             _users = users;
             _context = context;
+            _roles = roles;
+        }
+
+        public class returnUrlObj
+        {
+            public string returnUrl { get; set; }
+        }
+
+    //    [Authorize(AuthenticationSchemes = "IdentityServerJwtBearer,Identity.Application," + Constants.Scheme)]
+    //     [Authorize(AuthenticationSchemes = "IdentityServerJwt")]
+        [Authorize]
+        [AllowAnonymous]
+        [Route("login")]
+        public IActionResult Login([FromBody]returnUrlObj returnUrl)
+        {
+            return new OkObjectResult(
+                new
+                {
+                    returnUrl = returnUrl.returnUrl,
+                    roles = this.User?.Claims?.Where(_c => _c.Type == "role").Select(_c => _c.Value).ToArray() ?? new string[0]
+                });
         }
         [Route("")]
         public IActionResult Index()
@@ -99,6 +122,10 @@ namespace UserAdminLib.Controllers
                 var users = _users.Users.OrderBy(_u => _u.UserName).Where(_u => (_u.UserName.Contains(username) || (_u.Email.Contains(username)))).ToArray();
                 userinfo= CheckUsers(users);
             }
+            if (userinfo == null)
+            {
+                return BadRequest();
+            }
             return View("~/Views/UserAdminController/Search.cshtml", await GetModel<UserInfo[]>(userinfo));
         }
         [Route("Details")]
@@ -117,6 +144,30 @@ namespace UserAdminLib.Controllers
         {
             return View("~/Views/UserAdminController/Error.cshtml");
         }
+        [HttpPost()]
+        [Route("Remove")]
+        public async Task<IActionResult> Remove(System.Threading.CancellationToken cancel, string id)
+        {
+            return await _Remove(cancel, id);
+        }
+        protected virtual async Task<IActionResult> _Remove(System.Threading.CancellationToken cancel, string id)
+        {
+            if (!ModelState.IsValid)
+            {
+                return RedirectToAction("Error");
+            }
+            var user = await _users.FindByIdAsync(id);
+
+            if (user == null)
+            {
+                return RedirectToAction("Error");
+            }
+         //   await _users.RemoveFromRolesAsync(user, _roles.Roles.ToList().Select(_r => _r.Name));
+
+            await _users.DeleteAsync(user);
+
+            return RedirectToAction("Search");
+        }
         [HttpPost]
         [ValidateAntiForgeryToken]
         [Route("useradmin/Set")]
@@ -132,18 +183,18 @@ namespace UserAdminLib.Controllers
             {
                 return RedirectToAction("Error");
             }
-            if (userinfo.Email != null)
-            {
-                var token = await _users.GenerateChangeEmailTokenAsync(user, userinfo.Email);
-                var result = await _users.ChangeEmailAsync(user, userinfo.Email, token);
-            }
             if (HttpContext.Request.Form.ContainsKey("submit"))
             {
                 string getvalue(string _k) => HttpContext.Request.Form.ContainsKey(_k) ? HttpContext.Request.Form[_k].SingleOrDefault() : null;
 
                 var cmd = HttpContext.Request.Form["submit"].Single();
 
-                if (cmd == "save_admin")
+                if (cmd == "setemail")
+                {
+                    var token = await _users.GenerateChangeEmailTokenAsync(user, userinfo.Email);
+                    var result = await _users.ChangeEmailAsync(user, userinfo.Email, token);
+                }
+                else if (cmd == "save_admin")
                 {
                     typeof(TUser).GetProperty(_options.Field).SetValue(user, getvalue("doadmin") != null, new object[0]);
 
@@ -151,7 +202,7 @@ namespace UserAdminLib.Controllers
 
                     await _context.SaveChangesAsync();
                 }
-                else if (!await _Set(cmd, user,getvalue))
+                else if (!await _Set(cmd, user, getvalue))
                 {
                     return RedirectToAction("Error");
                 }
@@ -202,29 +253,37 @@ namespace UserAdminLib.Controllers
         }
 
     }
-    public class UserAdminController<TUser, TContext> : UserAdminBaseController<TUser, IdentityRole, string, TContext>
+    public sealed class UserAdminController<TUser, TContext> : UserAdminBaseController<TUser, IdentityRole, string, TContext>
         where TContext : DbContext
         where TUser : IdentityUser<string>
     {
         public UserAdminController(TContext context, IOptions<Configuration.UserAdminOptions> options, UserManager<TUser> users)
-            : base(context, options, users)
+            : base(context, options, users, null)
         {
         }
     }
-    public class UserAdminRolesController<TUser, TRole, TContext> : UserAdminBaseController<TUser, TRole, string, TContext>
+    public sealed class UserAdminRolesController<TUser, TRole, TContext> : UserAdminBaseController<TUser, TRole, string, TContext>
         where TUser : IdentityUser<string>
         where TRole : IdentityRole<string>
         where TContext : IdentityDbContext<TUser, TRole, string, IdentityUserClaim<string>, IdentityUserRole<string>, IdentityUserLogin<string>, IdentityRoleClaim<string>, IdentityUserToken<string>>
     {
         private readonly RoleManager<TRole> _roles;
-        private readonly Roles.IRoleSingleton _info;
+        private readonly Roles.IRoleSingleton<TRole> _info;
 
-        public UserAdminRolesController(TContext context, IOptions<Configuration.UserAdminOptions> options, UserManager<TUser> users,RoleManager<TRole> roles, Roles.IRoleSingleton info)
-            : base(context, options, users)
+        public UserAdminRolesController(TContext context, IOptions<Configuration.UserAdminOptions> options, UserManager<TUser> users,RoleManager<TRole> roles, Roles.IRoleSingleton<TRole> info = null)
+            : base(context, options, users, roles)
         {
             this._roles = roles;
             this._info = info;
         }
+    /*    protected override async Task<IActionResult> _Remove(CancellationToken cancel, string id)
+        {
+            foreach (var role in _roles.Roles.ToArray())
+            {
+                await _roles.DeleteAsync(role);
+            }
+            return await base._Remove(cancel, id);
+        }*/
         protected async override Task<UserInfo> CheckUser(TUser user)
         {
             var result = await base.CheckUser(user);
