@@ -9,7 +9,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "useradmin_spa_test", "usera
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "UserAdminLib", "UserAdminLib\UserAdminLib.csproj", "{165C304C-1C4C-46F4-A558-042CAFB378F2}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RoleDb", "RoleDb\RoleDb.csproj", "{0F998464-E653-4369-B6D2-0FDBFBFF99AE}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "RoleDb", "RoleDb\RoleDb.csproj", "{0F998464-E653-4369-B6D2-0FDBFBFF99AE}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "demo", "demo", "{818C545A-EA6A-477B-9216-FF09993B4D49}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -36,6 +38,10 @@ Global
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{D0546F89-DEEC-43AA-9BB8-B862E43275D7} = {818C545A-EA6A-477B-9216-FF09993B4D49}
+		{8A91992C-C956-41B4-9063-530F7E88B04B} = {818C545A-EA6A-477B-9216-FF09993B4D49}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {F82AC61E-D87D-4CB6-A3E8-8575F547D3AB}

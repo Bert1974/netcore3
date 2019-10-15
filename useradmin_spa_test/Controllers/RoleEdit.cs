@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using RoleDb;
+using RoleDb.Configuration;
 using RoleDb.Roles;
 using System;
 using System.Collections.Generic;
@@ -64,18 +65,18 @@ namespace useradmin
     {
         public override string ViewComponent => "CustomerEdit";
 
-        public CustomerRoleHandler(IdentityRole role) : base(role)
+        public CustomerRoleHandler(RoleDBRole roleinfo, IdentityRole role) : base(roleinfo, role)
         {
         }
-        public override async Task<bool> CheckRole(ApplicationDbContext db, ApplicationUser user)
+        public override async Task<bool> IsInRoleASync(ApplicationDbContext db, ApplicationUser user)
         {
             return await db.UserInfoTable.AnyAsync(_u => _u.ApplicationUserId == user.Id);
         }
-        public override async Task<IList<ApplicationUser>> GetUsers(ApplicationDbContext context, IUserStore<ApplicationUser> userstore, CancellationToken cancellationToken, IServiceProvider services)
+        public override async Task<IList<ApplicationUser>> GetUsersAsync(ApplicationDbContext context, IUserStore<ApplicationUser> userstore, CancellationToken cancellationToken, IServiceProvider services)
         {
             return await base.GetUsers(userstore, context.UserInfoTable.Select(_u => _u.ApplicationUserId));
         }
-        public override async Task AddRole(ApplicationDbContext context, ApplicationUser user)
+        public override async Task AddRoleASync(ApplicationDbContext context, ApplicationUser user)
         {
             var info = await context.UserInfoTable.SingleOrDefaultAsync(_u => _u.ApplicationUserId == user.Id);
 
@@ -86,7 +87,7 @@ namespace useradmin
                 await context.SaveChangesAsync();
             }
         }
-        public override async Task RemoveRole(ApplicationDbContext context, ApplicationUser user)
+        public override async Task RemoveRoleAsync(ApplicationDbContext context, ApplicationUser user)
         {
             var info = await context.UserInfoTable.SingleOrDefaultAsync(_u => _u.ApplicationUserId == user.Id);
 

@@ -12,6 +12,7 @@ using System.Linq;
 using System.Security.Claims;
 using System.Threading;
 using System.Threading.Tasks;
+using RoleDb.internals;
 
 namespace RoleDb
 {
@@ -225,279 +226,282 @@ namespace RoleDb
             return result;
         }
     }
-      public class RoleDbRoleStore<TUser, TRole, TContext> : RoleStore<TRole> where TUser : IdentityUser<string> where TRole : IdentityRole<string> where TContext : DbContext
-       {
-        private readonly RoleDBSingleton<TUser, TRole, TContext> _info;
-
-        public RoleDbRoleStore(RoleDBSingleton<TUser, TRole, TContext> info, TContext context, IdentityErrorDescriber describer = null)
-            : base(context, describer)
-        {
-            _info = info;
-        }
-        public override async Task<IdentityResult> DeleteAsync(TRole role, CancellationToken cancellationToken = default)
-        {
-            if (_info.GetRoleHandler(role.NormalizedName) != null)
-            {
-                throw new NotImplementedException();
-            }
-            return await base.DeleteAsync(role, cancellationToken);
-        }
-        public override async Task<IdentityResult> UpdateAsync(TRole role, CancellationToken cancellationToken = default)
-        {
-            if (_info.CheckRole(role))
-            {
-                throw new NotImplementedException();
-            }
-            return await base.UpdateAsync(role, cancellationToken);
-        }
-        public override async Task SetNormalizedRoleNameAsync(TRole role, string normalizedName, CancellationToken cancellationToken = default)
-        {
-            if (_info.CheckRole(role))// && role.NormalizedName != normalizedName)
-            {
-                throw new NotImplementedException();
-            }
-            await base.SetNormalizedRoleNameAsync(role, normalizedName, cancellationToken);
-        }
-        public override async Task SetRoleNameAsync(TRole role, string roleName, CancellationToken cancellationToken = default)
-        {
-            if (_info.CheckRole(role) )//||( _info.GetRoleHandler((await GetNormalizedRoleNameAsync(role,cancellationToken)))?.Name ?? roleName) != roleName)
-            {
-                throw new NotImplementedException();
-            }
-            await base.SetNormalizedRoleNameAsync(role, roleName, cancellationToken);
-        }
-    }
-    /*
-    public class RoleDbRoleManager<TUser, TRole, TContext> : RoleManager<TRole> where TUser : IdentityUser<string> where TContext : DbContext where TRole : IdentityRole<string>
+    namespace internals
     {
-        public RoleDbRoleManager(IRoleStore<TRole> store, IEnumerable<IRoleValidator<TRole>> roleValidators, ILookupNormalizer keyNormalizer, IdentityErrorDescriber errors, ILogger<RoleManager<TRole>> logger)
-            : base(store,roleValidators,keyNormalizer,errors,logger)
+        public class RoleDbRoleStore<TUser, TRole, TContext> : RoleStore<TRole> where TUser : IdentityUser<string> where TRole : IdentityRole<string> where TContext : DbContext
         {
+            private readonly RoleDBSingleton<TUser, TRole, TContext> _info;
 
-        }
-        public override Task<IdentityResult> CreateAsync(TRole role)
-        {
-            return base.CreateAsync(role);
-        }
-        public override Task<IdentityResult> DeleteAsync(TRole role)
-        {
-            return base.DeleteAsync(role);
-        }
-        public override Task<TRole> FindByIdAsync(string roleId)
-        {
-            return base.FindByIdAsync(roleId);
-        }
-        public override Task<TRole> FindByNameAsync(string roleName)
-        {
-            return base.FindByNameAsync(roleName);
-        }
-        public override Task<bool> RoleExistsAsync(string roleName)
-        {
-            return base.RoleExistsAsync(roleName);
-        }
-        public override Task<IdentityResult> SetRoleNameAsync(TRole role, string name)
-        {
-            return base.SetRoleNameAsync(role,name);
-        }
-        public override Task<IdentityResult> UpdateAsync(TRole role)
-        {
-            return base.UpdateAsync(role);
-        }
-        protected override async Task<IdentityResult> UpdateRoleAsync(TRole role)
-        {
-            return await base.UpdateRoleAsync(role);
-        }
-    }*/
-    /*   public class RoleDbRolesStore<TUser, TRole, TContext> : RoleStore<TRole> where TUser : IdentityUser<string> where TContext : DbContext where TRole : IdentityRole<string>
-       {
-           public RoleDbRolesStore(RoleDBSingleton<TUser, TRole, TContext> info, TContext context, IdentityErrorDescriber describer = null)
-           : base(context, describer)
-       {
-       }
-       public virtual Task<TRole> FindByIdAsync(string id, CancellationToken cancellationToken = default);
-       public virtual Task<TRole> FindByNameAsync(string normalizedName, CancellationToken cancellationToken = default);
-
-       }
-   }*/
-    public class RoleDbRoleRoleManager<TUser, TRole, TContext> : RoleManager<TRole> where TContext : DbContext where TRole : IdentityRole<string> where TUser : IdentityUser<string>
-    {
-        private readonly RoleDBSingleton<TUser, TRole, TContext> _info;
-
-        public RoleDbRoleRoleManager(RoleDBSingleton<TUser, TRole, TContext> info, IRoleStore<TRole> store, IEnumerable<IRoleValidator<TRole>> roleValidators, ILookupNormalizer keyNormalizer, IdentityErrorDescriber errors, ILogger<RoleManager<TRole>> logger)
-            : base(store,roleValidators,keyNormalizer,errors,logger)
-        {
-            _info = info;
-        }
-        public override Task<bool> RoleExistsAsync(string roleName)
-        {
-            return base.RoleExistsAsync(roleName);
-        }
-        public override Task<IdentityResult> UpdateAsync(TRole role)
-        {
-            return base.UpdateAsync(role);
-        }
-        protected override Task<IdentityResult> ValidateRoleAsync(TRole role)
-        {
-            return base.ValidateRoleAsync(role);
-        }
-        public override Task<IdentityResult> AddClaimAsync(TRole role, Claim claim)
-        {
-            return base.AddClaimAsync(role, claim);
-        }
-        public override Task<IdentityResult> RemoveClaimAsync(TRole role, Claim claim)
-        {
-            return base.RemoveClaimAsync(role, claim);
-        }
-        public override async Task<IdentityResult> CreateAsync(TRole role)
-        {
-            return await base.CreateAsync(role);
-        }
-        public override Task<IdentityResult> DeleteAsync(TRole role)
-        {
-            return base.DeleteAsync(role);
-        }
-    }
-
-  /*  public class RoleDBUserManager<TUser, TRole, TContext> : UserManager<TUser> where TUser : IdentityUser<string> where TContext : DbContext, IRoldeDBCOntext<TRole> where TRole : IdentityRole<string>
-    {
-        private readonly RoleDBSingleton<TUser, TRole, TContext> _info;
-        private readonly TContext _context;
-
-        public RoleDBUserManager(RoleDBSingleton<TUser, TRole, TContext> info,IUserStore<TUser> store, TContext context, IOptions<IdentityOptions> optionsAccessor, IPasswordHasher<TUser> passwordHasher, IEnumerable<IUserValidator<TUser>> userValidators, IEnumerable<IPasswordValidator<TUser>> passwordValidators, ILookupNormalizer keyNormalizer, IdentityErrorDescriber errors, IServiceProvider services, ILogger<UserManager<TUser>> logger)
-            : base(store,optionsAccessor,passwordHasher,userValidators,passwordValidators,keyNormalizer,errors,services,logger)
-        {
-            _info = info;
-            _context = context;
-        }
-        public override Task<IdentityResult> RemoveFromRoleAsync(TUser user, string role)
-        {
-            return base.RemoveFromRoleAsync(user, role);
-        }
-        public override Task<IdentityResult> AddToRolesAsync(TUser user, IEnumerable<string> roles)
-        {
-            return base.AddToRolesAsync(user, roles);
-        }
-        public override Task<IdentityResult> AddToRoleAsync(TUser user, string role)
-        {
-            return base.AddToRoleAsync(user, role);
-        }
-        public override Task<IList<string>> GetRolesAsync(TUser user)
-        {
-            return base.GetRolesAsync(user);
-        }
-        public override Task<IList<TUser>> GetUsersInRoleAsync(string roleName)
-        {
-            return base.GetUsersInRoleAsync(roleName);
-        }
-        public override async Task<bool> IsInRoleAsync(TUser user, string role)
-        {
-            var def = this._info.GetRoleHandler(role.ToUpper());
-            if (def != null)
+            public RoleDbRoleStore(RoleDBSingleton<TUser, TRole, TContext> info, TContext context, IdentityErrorDescriber describer = null)
+                : base(context, describer)
             {
-                return await def.IsInRoleASync(_context, user);
+                _info = info;
             }
-            return await base.IsInRoleAsync(user, role);
+            public override async Task<IdentityResult> DeleteAsync(TRole role, CancellationToken cancellationToken = default)
+            {
+                if (_info.GetRoleHandler(role.NormalizedName) != null)
+                {
+                    throw new NotImplementedException();
+                }
+                return await base.DeleteAsync(role, cancellationToken);
+            }
+            public override async Task<IdentityResult> UpdateAsync(TRole role, CancellationToken cancellationToken = default)
+            {
+                if (_info.CheckRole(role))
+                {
+                    throw new NotImplementedException();
+                }
+                return await base.UpdateAsync(role, cancellationToken);
+            }
+            public override async Task SetNormalizedRoleNameAsync(TRole role, string normalizedName, CancellationToken cancellationToken = default)
+            {
+                if (_info.CheckRole(role))// && role.NormalizedName != normalizedName)
+                {
+                    throw new NotImplementedException();
+                }
+                await base.SetNormalizedRoleNameAsync(role, normalizedName, cancellationToken);
+            }
+            public override async Task SetRoleNameAsync(TRole role, string roleName, CancellationToken cancellationToken = default)
+            {
+                if (_info.CheckRole(role))//||( _info.GetRoleHandler((await GetNormalizedRoleNameAsync(role,cancellationToken)))?.Name ?? roleName) != roleName)
+                {
+                    throw new NotImplementedException();
+                }
+                await base.SetNormalizedRoleNameAsync(role, roleName, cancellationToken);
+            }
         }
-        public override Task<IdentityResult> RemoveFromRolesAsync(TUser user, IEnumerable<string> roles)
+        /*
+        public class RoleDbRoleManager<TUser, TRole, TContext> : RoleManager<TRole> where TUser : IdentityUser<string> where TContext : DbContext where TRole : IdentityRole<string>
         {
-            return base.RemoveFromRolesAsync(user, roles);
+            public RoleDbRoleManager(IRoleStore<TRole> store, IEnumerable<IRoleValidator<TRole>> roleValidators, ILookupNormalizer keyNormalizer, IdentityErrorDescriber errors, ILogger<RoleManager<TRole>> logger)
+                : base(store,roleValidators,keyNormalizer,errors,logger)
+            {
+
+            }
+            public override Task<IdentityResult> CreateAsync(TRole role)
+            {
+                return base.CreateAsync(role);
+            }
+            public override Task<IdentityResult> DeleteAsync(TRole role)
+            {
+                return base.DeleteAsync(role);
+            }
+            public override Task<TRole> FindByIdAsync(string roleId)
+            {
+                return base.FindByIdAsync(roleId);
+            }
+            public override Task<TRole> FindByNameAsync(string roleName)
+            {
+                return base.FindByNameAsync(roleName);
+            }
+            public override Task<bool> RoleExistsAsync(string roleName)
+            {
+                return base.RoleExistsAsync(roleName);
+            }
+            public override Task<IdentityResult> SetRoleNameAsync(TRole role, string name)
+            {
+                return base.SetRoleNameAsync(role,name);
+            }
+            public override Task<IdentityResult> UpdateAsync(TRole role)
+            {
+                return base.UpdateAsync(role);
+            }
+            protected override async Task<IdentityResult> UpdateRoleAsync(TRole role)
+            {
+                return await base.UpdateRoleAsync(role);
+            }
+        }*/
+        /*   public class RoleDbRolesStore<TUser, TRole, TContext> : RoleStore<TRole> where TUser : IdentityUser<string> where TContext : DbContext where TRole : IdentityRole<string>
+           {
+               public RoleDbRolesStore(RoleDBSingleton<TUser, TRole, TContext> info, TContext context, IdentityErrorDescriber describer = null)
+               : base(context, describer)
+           {
+           }
+           public virtual Task<TRole> FindByIdAsync(string id, CancellationToken cancellationToken = default);
+           public virtual Task<TRole> FindByNameAsync(string normalizedName, CancellationToken cancellationToken = default);
+
+           }
+       }*/
+        public class RoleDbRoleRoleManager<TUser, TRole, TContext> : RoleManager<TRole> where TContext : DbContext where TRole : IdentityRole<string> where TUser : IdentityUser<string>
+        {
+            private readonly RoleDBSingleton<TUser, TRole, TContext> _info;
+
+            public RoleDbRoleRoleManager(RoleDBSingleton<TUser, TRole, TContext> info, IRoleStore<TRole> store, IEnumerable<IRoleValidator<TRole>> roleValidators, ILookupNormalizer keyNormalizer, IdentityErrorDescriber errors, ILogger<RoleManager<TRole>> logger)
+                : base(store, roleValidators, keyNormalizer, errors, logger)
+            {
+                _info = info;
+            }
+            public override Task<bool> RoleExistsAsync(string roleName)
+            {
+                return base.RoleExistsAsync(roleName);
+            }
+            public override Task<IdentityResult> UpdateAsync(TRole role)
+            {
+                return base.UpdateAsync(role);
+            }
+            protected override Task<IdentityResult> ValidateRoleAsync(TRole role)
+            {
+                return base.ValidateRoleAsync(role);
+            }
+            public override Task<IdentityResult> AddClaimAsync(TRole role, Claim claim)
+            {
+                return base.AddClaimAsync(role, claim);
+            }
+            public override Task<IdentityResult> RemoveClaimAsync(TRole role, Claim claim)
+            {
+                return base.RemoveClaimAsync(role, claim);
+            }
+            public override async Task<IdentityResult> CreateAsync(TRole role)
+            {
+                return await base.CreateAsync(role);
+            }
+            public override Task<IdentityResult> DeleteAsync(TRole role)
+            {
+                return base.DeleteAsync(role);
+            }
         }
-        public override bool SupportsUserRole => base.SupportsUserRole;
-    }*/
+
+        /*  public class RoleDBUserManager<TUser, TRole, TContext> : UserManager<TUser> where TUser : IdentityUser<string> where TContext : DbContext, IRoldeDBCOntext<TRole> where TRole : IdentityRole<string>
+          {
+              private readonly RoleDBSingleton<TUser, TRole, TContext> _info;
+              private readonly TContext _context;
+
+              public RoleDBUserManager(RoleDBSingleton<TUser, TRole, TContext> info,IUserStore<TUser> store, TContext context, IOptions<IdentityOptions> optionsAccessor, IPasswordHasher<TUser> passwordHasher, IEnumerable<IUserValidator<TUser>> userValidators, IEnumerable<IPasswordValidator<TUser>> passwordValidators, ILookupNormalizer keyNormalizer, IdentityErrorDescriber errors, IServiceProvider services, ILogger<UserManager<TUser>> logger)
+                  : base(store,optionsAccessor,passwordHasher,userValidators,passwordValidators,keyNormalizer,errors,services,logger)
+              {
+                  _info = info;
+                  _context = context;
+              }
+              public override Task<IdentityResult> RemoveFromRoleAsync(TUser user, string role)
+              {
+                  return base.RemoveFromRoleAsync(user, role);
+              }
+              public override Task<IdentityResult> AddToRolesAsync(TUser user, IEnumerable<string> roles)
+              {
+                  return base.AddToRolesAsync(user, roles);
+              }
+              public override Task<IdentityResult> AddToRoleAsync(TUser user, string role)
+              {
+                  return base.AddToRoleAsync(user, role);
+              }
+              public override Task<IList<string>> GetRolesAsync(TUser user)
+              {
+                  return base.GetRolesAsync(user);
+              }
+              public override Task<IList<TUser>> GetUsersInRoleAsync(string roleName)
+              {
+                  return base.GetUsersInRoleAsync(roleName);
+              }
+              public override async Task<bool> IsInRoleAsync(TUser user, string role)
+              {
+                  var def = this._info.GetRoleHandler(role.ToUpper());
+                  if (def != null)
+                  {
+                      return await def.IsInRoleASync(_context, user);
+                  }
+                  return await base.IsInRoleAsync(user, role);
+              }
+              public override Task<IdentityResult> RemoveFromRolesAsync(TUser user, IEnumerable<string> roles)
+              {
+                  return base.RemoveFromRolesAsync(user, roles);
+              }
+              public override bool SupportsUserRole => base.SupportsUserRole;
+          }*/
         public class RoleDBUserStore<TUser, TRole, TContext> : Microsoft.AspNetCore.Identity.EntityFrameworkCore.UserStore<TUser, TRole, TContext> where TUser : IdentityUser<string> where TContext : DbContext where TRole : IdentityRole<string>
         {
             private readonly RoleDBSingleton<TUser, TRole, TContext> _info;
-        private readonly IServiceProvider _services;
-        private readonly TContext _context;
+            private readonly IServiceProvider _services;
+            private readonly TContext _context;
 
-        public RoleDBUserStore(RoleDBSingleton<TUser, TRole, TContext> info, TContext context, IServiceProvider services, IdentityErrorDescriber describer = null)
-            : base(context, describer)
-        {
-            this._info = info;
-            this._services = services;
-            this._context = context;
-        }
-        public override async Task<IdentityResult> CreateAsync(TUser user, CancellationToken cancellationToken = default)
-        {
-            var r = await base.CreateAsync(user, cancellationToken);
-
-            if (r == IdentityResult.Success)
+            public RoleDBUserStore(RoleDBSingleton<TUser, TRole, TContext> info, TContext context, IServiceProvider services, IdentityErrorDescriber describer = null)
+                : base(context, describer)
             {
-                await _info.CreateDefaultRulesAsync(this, user);
-                await _context.SaveChangesAsync();
+                this._info = info;
+                this._services = services;
+                this._context = context;
             }
-            return r;
-        }
-        public override async Task<IdentityResult> DeleteAsync(TUser user, CancellationToken cancellationToken = default)
-        {
-            await this._info.RemoveRolesAsync(user, _context);
-            return await base.DeleteAsync(user, cancellationToken);
-        }
-        public override async Task AddToRoleAsync(TUser user, string normalizedRoleName, CancellationToken cancellationToken = default)
-        { 
-            await base.AddToRoleAsync(user, normalizedRoleName, cancellationToken);
-
-            Trace.Assert(await base.IsInRoleAsync(user, normalizedRoleName, cancellationToken));
-
-            var def = this._info.GetRoleHandler(normalizedRoleName);
-            if (def != null)
+            public override async Task<IdentityResult> CreateAsync(TUser user, CancellationToken cancellationToken = default)
             {
-                await def.AddRoleASync(_context, user);
+                var r = await base.CreateAsync(user, cancellationToken);
+
+                if (r == IdentityResult.Success)
+                {
+                    await _info.CreateDefaultRulesAsync(this, user);
+                    await _context.SaveChangesAsync();
+                }
+                return r;
             }
-        }
-        public override async Task<IList<string>> GetRolesAsync(TUser user, CancellationToken cancellationToken = default)
-        {
-            List<string> result = new List<string>();
-            result.AddRange(await base.GetRolesAsync(user, cancellationToken));
-      //      result.AddRange(await _info.GetRolesAsync(_context,user));
-            // await _info.SyncUser(_context, this, user, _services);
-            return result;// await base.GetRolesAsync(user, cancellationToken);
-        }
-        public override async Task<IList<TUser>> GetUsersInRoleAsync(string normalizedRoleName, CancellationToken cancellationToken = default)
-        {
-         /*   var def = this._info.GetRoleHandler(normalizedRoleName);
-            if (def != null)
+            public override async Task<IdentityResult> DeleteAsync(TUser user, CancellationToken cancellationToken = default)
             {
-                return await def.GetUsersAsync(_context, this, cancellationToken, _services);
-            }*/
-            return await base.GetUsersInRoleAsync(normalizedRoleName, cancellationToken);
-        }
-        public override async Task<bool> IsInRoleAsync(TUser user, string normalizedRoleName, CancellationToken cancellationToken = default)
-        {
-      /*      var def = this._info.GetRoleHandler(normalizedRoleName);
-            if (def != null)
-            {
-                return await def.IsInRoleASync(_context, user);
-            }*/
-            return await base.IsInRoleAsync(user, normalizedRoleName, cancellationToken);
-        }
-        public override async Task RemoveFromRoleAsync(TUser user, string normalizedRoleName, CancellationToken cancellationToken = default)
-        {
-            var def = this._info.GetRoleHandler(normalizedRoleName);
-            if (def != null)
-            {
-                await def.RemoveRoleAsync(_context, user);
+                await this._info.RemoveRolesAsync(user, _context);
+                return await base.DeleteAsync(user, cancellationToken);
             }
-            await base.RemoveFromRoleAsync(user, normalizedRoleName, cancellationToken);
-        }
-        protected override async Task<TRole> FindRoleAsync(string normalizedRoleName, CancellationToken cancellationToken)
-        {
-         /*   var def = this._info.GetRoleHandler(normalizedRoleName);
-            if (def != null)
+            public override async Task AddToRoleAsync(TUser user, string normalizedRoleName, CancellationToken cancellationToken = default)
             {
-                return def.Role;
-            }*/
-            return await base.FindRoleAsync(normalizedRoleName, cancellationToken);
-        }
-        protected override async Task<IdentityUserRole<string>> FindUserRoleAsync(string userId, string roleId, CancellationToken cancellationToken)
-        {
-            var result= await base.FindUserRoleAsync(userId, roleId, cancellationToken);
+                await base.AddToRoleAsync(user, normalizedRoleName, cancellationToken);
 
-            if (result == null)
-            {
+                Trace.Assert(await base.IsInRoleAsync(user, normalizedRoleName, cancellationToken));
 
+                var def = this._info.GetRoleHandler(normalizedRoleName);
+                if (def != null)
+                {
+                    await def.AddRoleASync(_context, user);
+                }
             }
-            return result;
+            public override async Task<IList<string>> GetRolesAsync(TUser user, CancellationToken cancellationToken = default)
+            {
+                List<string> result = new List<string>();
+                result.AddRange(await base.GetRolesAsync(user, cancellationToken));
+                //      result.AddRange(await _info.GetRolesAsync(_context,user));
+                // await _info.SyncUser(_context, this, user, _services);
+                return result;// await base.GetRolesAsync(user, cancellationToken);
+            }
+            public override async Task<IList<TUser>> GetUsersInRoleAsync(string normalizedRoleName, CancellationToken cancellationToken = default)
+            {
+                /*   var def = this._info.GetRoleHandler(normalizedRoleName);
+                   if (def != null)
+                   {
+                       return await def.GetUsersAsync(_context, this, cancellationToken, _services);
+                   }*/
+                return await base.GetUsersInRoleAsync(normalizedRoleName, cancellationToken);
+            }
+            public override async Task<bool> IsInRoleAsync(TUser user, string normalizedRoleName, CancellationToken cancellationToken = default)
+            {
+                /*      var def = this._info.GetRoleHandler(normalizedRoleName);
+                      if (def != null)
+                      {
+                          return await def.IsInRoleASync(_context, user);
+                      }*/
+                return await base.IsInRoleAsync(user, normalizedRoleName, cancellationToken);
+            }
+            public override async Task RemoveFromRoleAsync(TUser user, string normalizedRoleName, CancellationToken cancellationToken = default)
+            {
+                var def = this._info.GetRoleHandler(normalizedRoleName);
+                if (def != null)
+                {
+                    await def.RemoveRoleAsync(_context, user);
+                }
+                await base.RemoveFromRoleAsync(user, normalizedRoleName, cancellationToken);
+            }
+            protected override async Task<TRole> FindRoleAsync(string normalizedRoleName, CancellationToken cancellationToken)
+            {
+                /*   var def = this._info.GetRoleHandler(normalizedRoleName);
+                   if (def != null)
+                   {
+                       return def.Role;
+                   }*/
+                return await base.FindRoleAsync(normalizedRoleName, cancellationToken);
+            }
+            protected override async Task<IdentityUserRole<string>> FindUserRoleAsync(string userId, string roleId, CancellationToken cancellationToken)
+            {
+                var result = await base.FindUserRoleAsync(userId, roleId, cancellationToken);
+
+                if (result == null)
+                {
+
+                }
+                return result;
+            }
         }
     }
     public static class Extensions

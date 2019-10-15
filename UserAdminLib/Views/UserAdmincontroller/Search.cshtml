@@ -27,27 +27,34 @@
                     <tr>
                         <th>Name</th>
                         <th>EMail</th>
-                        <th>Roles</th>
+                        @if (Model.Roles != null)
+                        {
+                            <th>Roles</th>
+                        }
+                        <th>Actions</th>
                     </tr>
                 </thead>
                 @foreach (var u in Model.Data)
                 {
-                    <tr>
-                        <td>@u.UserName</td>
-                        <td>@u.Email</td>
-                        <td>@string.Join(",",u.Roles)</td>
-                        <td>
-                            <form asp-action="Details" method="post">
-                                <input type="hidden" name="id" value="@u.Id" />
-                                <button type="submit" name="submit" value="Details">Details</button>
-                            </form>
-                            <form asp-action="Remove" method="post">
-                                <input type="hidden" name="id" value="@u.Id" />
-                                <button type="submit">Remove</button>
-                            </form>
+            <tr>
+                <td>@u.UserName</td>
+                <td>@u.Email</td>
+                @if (Model.Roles != null)
+                {
+                    <td>@string.Join(",", u.Roles)</td>
+                }
+                    <td>
+                        <form asp-action="Details" method="post">
+                            <input type="hidden" name="id" value="@u.Id" />
+                            <button type="submit" name="submit" value="Details">Details</button>
+                        </form>
+                        <form asp-action="Remove" method="post">
+                            <input type="hidden" name="id" value="@u.Id" />
+                            <button type="submit">Remove</button>
+                        </form>
 
-                        </td>
-                    </tr>
+                    </td>
+                </tr>
                 }
             </table>
         </div>

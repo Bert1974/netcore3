@@ -8,6 +8,7 @@ using RoleDb.Configuration;
 using System.Threading.Tasks;
 using useradmin.Data;
 using useradmin.Entities;
+using UserAdminLib;
 
 namespace useradmin
 {
@@ -18,6 +19,10 @@ namespace useradmin
             var host = CreateWebHostBuilder(args).Build();
 
             using (var scope = host.Services.CreateScope())
+            {
+                CreateRoles(scope).Wait();
+            }
+       /*     using (var scope = host.Services.CreateScope())
             {
                 //  var test = scope.ServiceProvider.GetServices(typeof(RoleManager<IdentityRole>)).ToArray();
                 //    using (var users = host.Services.GetRequiredService<UserManager<ApplicationUser>>())
@@ -42,9 +47,28 @@ namespace useradmin
 
                     users.AddToRoleAsync(user, UserAdminLib.Constants.Role).Wait();
                 }
-            }
+            }*/
 
             host.Run();
+        }
+
+        private static async Task CreateRoles(IServiceScope scope)
+        {
+            await scope.ServiceProvider.SyncRoleDb<ApplicationUser, IdentityRole, ApplicationDbContext>(); // add roles from RoleDbOptions
+            await scope.ServiceProvider.SyncUserAdmin<ApplicationUser, IdentityRole, ApplicationDbContext>(); // add admin roll if needed
+
+            using (var users = scope.ServiceProvider.GetRequiredService<UserManager<ApplicationUser>>())
+            {
+                var user = await users.FindByEmailAsync("bbruggeman1974@gmail.com"); // need a admin sometimes
+
+                if (user != null)
+                {
+                    if (!await users.IsInRoleAsync(user, UserAdminLib.Constants.Role))
+                    {
+                        await users.AddToRoleAsync(user, UserAdminLib.Constants.Role);
+                    }
+                }
+            }
         }
 
         private static async Task CheckAddRole(RoleManager<IdentityRole> roles, string role)
