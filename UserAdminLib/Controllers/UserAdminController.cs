@@ -87,14 +87,13 @@ namespace UserAdminLib.Controllers
     //    [Authorize(AuthenticationSchemes = "IdentityServerJwtBearer,Identity.Application," + Constants.Scheme)]
     //     [Authorize(AuthenticationSchemes = "IdentityServerJwt")]
         [Authorize]
-        [AllowAnonymous]
+      //  [AllowAnonymous]
         [Route("login")]
-        public IActionResult Login([FromBody]returnUrlObj returnUrl)
+        public IActionResult Login()
         {
             return new OkObjectResult(
                 new
                 {
-                    returnUrl = returnUrl.returnUrl,
                     roles = this.User?.Claims?.Where(_c => _c.Type == "role").Select(_c => _c.Value).ToArray() ?? new string[0]
                 });
         }
@@ -108,6 +107,10 @@ namespace UserAdminLib.Controllers
         public async Task<IActionResult> Search()
         {
             var user = await _users.FindByNameAsync(User.Identity.Name);
+            if (user == null)
+            {
+                return RedirectToAction("Error");
+            }
             return RedirectToAction("Details", new { id = user.Id });
         }
         [HttpPost]
