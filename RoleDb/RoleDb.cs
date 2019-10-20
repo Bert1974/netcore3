@@ -37,7 +37,7 @@ namespace RoleDb
             bool IsDefault { get; }
 
             Task AddRoleASync(TContext context, TUser user);
-            Task RemoveRoleAsync(TContext context, TUser user);
+            Task RemoveRoleAsync(TContext context, TUser user, IServiceProvider services);
             Task<bool> IsInRoleASync(TContext context, TUser user);
             Task<IList<TUser>> GetUsersAsync(TContext context, IUserStore<TUser> userstore, CancellationToken cancellationToken, IServiceProvider services);
         }
@@ -58,7 +58,7 @@ namespace RoleDb
             }
 
             public abstract Task AddRoleASync(TContext context, TUser user);
-            public abstract Task RemoveRoleAsync(TContext context, TUser user);
+            public abstract Task RemoveRoleAsync(TContext context, TUser user, IServiceProvider services);
             public abstract Task<bool> IsInRoleASync(TContext context, TUser user);
             public abstract Task<IList<TUser>> GetUsersAsync(TContext context, IUserStore<TUser> userstore, CancellationToken cancellationToken, IServiceProvider services);
 
@@ -79,13 +79,14 @@ namespace RoleDb
     {
         private readonly Dictionary<TRole, Roles.IRoleHandler<TUser, TRole, TContext>> allroles = new Dictionary<TRole, Roles.IRoleHandler<TUser, TRole, TContext>>();
 
-        public async Task SyncRoles(TContext context, Configuration.RoleDBOptions options, RoleManager<TRole> roles)
+        public async Task SyncRoles(TContext context, Configuration.RoleDBOptions options, IServiceProvider services)
         {
             if (allroles.Count == 0 && options.Roles.Length > 0)
             {
+                var roles =  services.GetRequiredService<RoleManager<TRole>>();
                 foreach (var o in options.Roles)
                 {
-                    var role = await CreateGetRoleASync(roles, o);
+                    var role = await CreateGetRoleASync(roles, o, services);
                     var info = Create(context, o, role);
                     this.allroles[role] = info;
                 }
@@ -100,7 +101,7 @@ namespace RoleDb
             }
             return null;
         }
-        private async Task<TRole> CreateGetRoleASync(RoleManager<TRole> roles, RoleDBRole o)
+        private async Task<TRole> CreateGetRoleASync(RoleManager<TRole> roles, RoleDBRole o, IServiceProvider services)
         {
             var name = o.Name;
             var role = await roles.FindByNameAsync(name.ToUpper());
@@ -197,11 +198,11 @@ namespace RoleDb
             return GetRoleHandler(normalizedRoleName);
         }
 
-        internal async Task RemoveRolesAsync(TUser user, TContext context)
+        internal async Task RemoveRolesAsync(TUser user, TContext context, IServiceProvider services)
         {
             foreach (var h in allroles.Values.Where(_h => _h != null))
             {
-                await h.RemoveRoleAsync(context, user);
+                await h.RemoveRoleAsync(context, user, services);
             }
         }
 
@@ -231,11 +232,13 @@ namespace RoleDb
         public class RoleDbRoleStore<TUser, TRole, TContext> : RoleStore<TRole> where TUser : IdentityUser<string> where TRole : IdentityRole<string> where TContext : DbContext
         {
             private readonly RoleDBSingleton<TUser, TRole, TContext> _info;
+            protected readonly IServiceProvider _services;
 
-            public RoleDbRoleStore(RoleDBSingleton<TUser, TRole, TContext> info, TContext context, IdentityErrorDescriber describer = null)
+            public RoleDbRoleStore(RoleDBSingleton<TUser, TRole, TContext> info, TContext context, IServiceProvider services, IdentityErrorDescriber describer = null)
                 : base(context, describer)
             {
                 _info = info;
+                _services = services;
             }
             public override async Task<IdentityResult> DeleteAsync(TRole role, CancellationToken cancellationToken = default)
             {
@@ -433,7 +436,7 @@ namespace RoleDb
             }
             public override async Task<IdentityResult> DeleteAsync(TUser user, CancellationToken cancellationToken = default)
             {
-                await this._info.RemoveRolesAsync(user, _context);
+                await this._info.RemoveRolesAsync(user, _context, _services);
                 return await base.DeleteAsync(user, cancellationToken);
             }
             public override async Task AddToRoleAsync(TUser user, string normalizedRoleName, CancellationToken cancellationToken = default)
@@ -479,7 +482,7 @@ namespace RoleDb
                 var def = this._info.GetRoleHandler(normalizedRoleName);
                 if (def != null)
                 {
-                    await def.RemoveRoleAsync(_context, user);
+                    await def.RemoveRoleAsync(_context, user, _services);
                 }
                 await base.RemoveFromRoleAsync(user, normalizedRoleName, cancellationToken);
             }
@@ -532,13 +535,13 @@ namespace RoleDb
         {
             var info = services.GetRequiredService<RoleDb.RoleDBSingleton<TUser, TRole, TContext>>();
             var options = services.GetRequiredService<IOptions<RoleDBOptions>>();
-            var rolestore = services.GetRequiredService<IRoleStore<TRole>>();
+      /*      var rolestore = services.GetRequiredService<IRoleStore<TRole>>();
             var userstore = services.GetRequiredService<IUserStore<TUser>>();
             var roles = services.GetRequiredService<RoleManager<TRole>>();
-            var users = services.GetRequiredService<UserManager<TUser>>();
+            var users = services.GetRequiredService<UserManager<TUser>>();*/
             var context = services.GetRequiredService<TContext>();
 
-            await info.SyncRoles(context, options.Value, roles); // add roles from options
+            await info.SyncRoles(context, options.Value, services); // add roles from options
         //    info.SyncUsers(context, userstore as RoleDBUserStore<TUser, TRole, TContext>);
         }
     }

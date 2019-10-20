@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.DependencyInjection;
 using RoleDb;
 using RoleDb.Configuration;
 using RoleDb.Roles;
@@ -87,7 +88,7 @@ namespace useradmin
                 await context.SaveChangesAsync();
             }
         }
-        public override async Task RemoveRoleAsync(ApplicationDbContext context, ApplicationUser user)
+        public override async Task RemoveRoleAsync(ApplicationDbContext context, ApplicationUser user, IServiceProvider services)
         {
             var info = await context.UserInfoTable.SingleOrDefaultAsync(_u => _u.ApplicationUserId == user.Id);
 
