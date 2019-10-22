@@ -1,26 +1,23 @@
-﻿<Project Sdk="Microsoft.NET.Sdk.Web">
+<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <TargetFramework>netcoreapp3.0</TargetFramework>
-    <ApplicationIcon />
-    <OutputType>Library</OutputType>
-    <StartupObject />
     <IsPackable>true</IsPackable>
     <PackageId>BB74.RoleDb</PackageId>
     <Authors>Bert Bruggeman</Authors>
-    <PackageTags>netcore3 angular netcore identity</PackageTags>
+    <PackageTags>netcore3 asp.net netcore identity</PackageTags>
     <PackageProjectUrl>https://github.com/Bert1974/netcore3/tree/master/RoleDb</PackageProjectUrl>
     <RepositoryUrl>https://github.com/Bert1974/netcore3/tree/master/RoleDb</RepositoryUrl>
     <RepositoryType>GIT</RepositoryType>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+    <Version>0.1.0</Version>
+    <Copyright>2019 Bert Bruggeman</Copyright>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="BB74.UserAdminLib" Version="0.2.0" />
     <PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="3.0.0" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <ProjectReference Include="..\UserAdminLib\UserAdminLib.csproj" />
   </ItemGroup>
 
 </Project>

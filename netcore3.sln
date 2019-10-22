@@ -9,9 +9,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "useradmin_spa_test", "usera
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "UserAdminLib", "UserAdminLib\UserAdminLib.csproj", "{165C304C-1C4C-46F4-A558-042CAFB378F2}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "RoleDb", "RoleDb\RoleDb.csproj", "{0F998464-E653-4369-B6D2-0FDBFBFF99AE}"
-EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "demo", "demo", "{818C545A-EA6A-477B-9216-FF09993B4D49}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RoleDb", "RoleDb\RoleDb.csproj", "{E713A480-CB90-47F1-8055-CE0349EE42C0}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -31,10 +31,10 @@ Global
 		{165C304C-1C4C-46F4-A558-042CAFB378F2}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{165C304C-1C4C-46F4-A558-042CAFB378F2}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{165C304C-1C4C-46F4-A558-042CAFB378F2}.Release|Any CPU.Build.0 = Release|Any CPU
-		{0F998464-E653-4369-B6D2-0FDBFBFF99AE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{0F998464-E653-4369-B6D2-0FDBFBFF99AE}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{0F998464-E653-4369-B6D2-0FDBFBFF99AE}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{0F998464-E653-4369-B6D2-0FDBFBFF99AE}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E713A480-CB90-47F1-8055-CE0349EE42C0}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E713A480-CB90-47F1-8055-CE0349EE42C0}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E713A480-CB90-47F1-8055-CE0349EE42C0}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E713A480-CB90-47F1-8055-CE0349EE42C0}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
