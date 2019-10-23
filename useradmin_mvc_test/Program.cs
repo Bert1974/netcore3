@@ -22,31 +22,48 @@ namespace useradmin_mvc_test
 
             using (var scope = host.Services.CreateScope())
             {
-                //  var test = scope.ServiceProvider.GetServices(typeof(RoleManager<IdentityRole>)).ToArray();
-                //    using (var users = host.Services.GetRequiredService<UserManager<ApplicationUser>>())
-                using (var userstore = scope.ServiceProvider.GetRequiredService<IUserStore<ApplicationUser>>())
-                using (var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>())
-                {
-                    var user = userstore.FindByNameAsync("bbruggeman1974@gmail.com",default).GetAwaiter().GetResult();
-
-              //      var claim = new Claim(ClaimTypes.Role, useradminlib.Constants.Role);
-
-             //       (userstore as Microsoft.AspNetCore.Identity.EntityFrameworkCore.UserOnlyStore<IdentityUser>).AddClaimsAsync(user, new Claim[] { claim }, default).Wait();
-
-               //     var info = scope.ServiceProvider.GetRequiredService<MyRoleSingleton<ApplicationUser, IdentityRole, ApplicationDbContext>>();
-               //    var options = scope.ServiceProvider.GetRequiredService<IOptions<MyRoleManagerOptions>>();
-
-                    //      CheckAddRole(roles, useradminlib.Constants.Role).Wait();
-                    //     CheckAddRole(roles, "Admin").Wait();
-                    //    CheckAddRole(roles, "Customer").Wait();
-
-                    //        info.SyncRoles(options.Value, rolesstore); // add roles from options
-
-                    //      info.SyncUsers(context, userstore as userstore<ApplicationUser, IdentityRole, ApplicationDbContext>);
-                }
+                Initialize(scope).Wait();
             }
-
             host.Run();
+        }
+
+        private static async Task Initialize(IServiceScope scope)
+        {
+            //  var test = scope.ServiceProvider.GetServices(typeof(RoleManager<IdentityRole>)).ToArray();
+            //    using (var users = host.Services.GetRequiredService<UserManager<ApplicationUser>>())
+            var userstore = scope.ServiceProvider.GetRequiredService<IUserStore<ApplicationUser>>();
+            var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+            var users = scope.ServiceProvider.GetRequiredService<UserManager<ApplicationUser>>();
+
+            var user = userstore.FindByNameAsync("bbruggeman1974@gmail.com", default).GetAwaiter().GetResult();
+
+           if (user != null)
+            {
+                user.IsUseradmin = true;
+
+                context.Update(user);
+                context.SaveChanges();
+
+            /*    if (!await users.IsInRoleAsync(user, UserAdminLib.Constants.Role))
+                {
+                    await users.AddToRoleAsync(user, UserAdminLib.Constants.Role);
+                }*/
+            }
+            //      var claim = new Claim(ClaimTypes.Role, useradminlib.Constants.Role);
+
+            //       (userstore as Microsoft.AspNetCore.Identity.EntityFrameworkCore.UserOnlyStore<IdentityUser>).AddClaimsAsync(user, new Claim[] { claim }, default).Wait();
+
+            //     var info = scope.ServiceProvider.GetRequiredService<MyRoleSingleton<ApplicationUser, IdentityRole, ApplicationDbContext>>();
+            //    var options = scope.ServiceProvider.GetRequiredService<IOptions<MyRoleManagerOptions>>();
+
+            //      CheckAddRole(roles, useradminlib.Constants.Role).Wait();
+            //     CheckAddRole(roles, "Admin").Wait();
+            //    CheckAddRole(roles, "Customer").Wait();
+
+            //        info.SyncRoles(options.Value, rolesstore); // add roles from options
+
+            //      info.SyncUsers(context, userstore as userstore<ApplicationUser, IdentityRole, ApplicationDbContext>);
+
         }
 
         public static IHostBuilder CreateHostBuilder(string[] args) =>

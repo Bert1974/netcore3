@@ -14,9 +14,11 @@ namespace UserAdminLib
     {
         public ZipFileSystem(Stream stream, string rootpoath)
         {
-            this.rootpath = rootpoath;
+            // make sure rootpath doesn't end with /
             if (!string.IsNullOrEmpty(rootpoath) && rootpoath.EndsWith("/")) { rootpoath = rootpoath.Substring(0, rootpoath.Length - 1); }
+            this.rootpath = rootpoath;
 
+            // unpack files
             using (var a = new ZipArchive(stream, ZipArchiveMode.Read))
             {
                 foreach (var e in a.Entries)
@@ -30,23 +32,29 @@ namespace UserAdminLib
                         }
                         if (e.ExternalAttributes == 16)  // dir ?
                         {
-                            var f = new ZipFileSystem.FIleInfo(e.FullName,rootpath);
-                            allfiles[f.FullPath] = f;
+                            var f = new ZipFileSystem.FIleInfo(e.FullName,rootpath, true);
+                            allfiles[f.FullPath.ToUpper()] = f;
                         }
                     }
                 }
             }
         }
 
-        private Dictionary<string, ZipFileSystem.FIleInfo> allfiles = new Dictionary<string, ZipFileSystem.FIleInfo>();
+        private readonly Dictionary<string, ZipFileSystem.FIleInfo> allfiles = new Dictionary<string, ZipFileSystem.FIleInfo>();
         private readonly string rootpath;
 
         IDirectoryContents IFileProvider.GetDirectoryContents(string subpath)
         {
-            var files = this.allfiles.Keys.Where(_f => _f.StartsWith(subpath.ToUpper())).ToArray();
+            //lookip has uppercase
+            subpath = subpath.ToUpper();
 
+            // get files within subpath
+            var files = this.allfiles.Keys.Where(_f => _f.StartsWith(subpath)).ToArray();
+
+            //directories end with / and files have 1 dir 1 front.. filters files
             files = files.Where(_f => _f.Substring(subpath.Length).Count(_c => _c == '/') == 1).ToArray();
 
+            // lookup fileinfo's & return
             return new DirInfo(files.Select(_f => allfiles[_f]).ToArray());
         }
 
@@ -56,11 +64,12 @@ namespace UserAdminLib
             {
                 return file;
             }
-            return new ZipFileSystem.FIleInfo(subpath,this.rootpath);
+            return new ZipFileSystem.FIleInfo(subpath,this.rootpath, false);
         }
 
         IChangeToken IFileProvider.Watch(string filter)
         {
+            //???
             return new FileWatch();
         }
 
@@ -81,7 +90,7 @@ namespace UserAdminLib
             public DirInfo(FIleInfo[] content)
             {
                 this.content = content;
-                Exists = content.Any();
+                Exists = content.Any(); // directories are there also
             }
             public bool Exists { get; }
 
@@ -99,14 +108,14 @@ namespace UserAdminLib
         {
             private readonly byte[] data;
 
-            public FIleInfo(string path, string rootpoath)
+            public FIleInfo(string path, string rootpath, bool exists)
             {
-                this.Exists = false;
+                this.Exists = exists;
                 this.IsDirectory = path.EndsWith("/");
                 this.LastModified = default;
                 this.Length =0;
                 this.Name = Path.GetFileName(this.IsDirectory?path.Substring(0,path.Length-1):path);
-                this.FullPath = path.Substring(rootpoath.Length);
+                this.FullPath = path.Substring(rootpath.Length);
             }
             public FIleInfo(ZipArchiveEntry e, string rootpoath)
             {

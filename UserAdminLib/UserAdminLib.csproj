@@ -14,7 +14,7 @@
     <PackageTags>netcore3 asp.net netcore identity</PackageTags>
     <Authors>Bert Bruggeman</Authors>
     <PackageId>BB74.UserAdminLib</PackageId>
-    <Version>0.2.3</Version>
+    <Version>0.2.4</Version>
     <Copyright>2019 Bert Bruggeman</Copyright>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <EnableDefaultEmbeddedResourceItems>false</EnableDefaultEmbeddedResourceItems>

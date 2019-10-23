@@ -1,4 +1,7 @@
-﻿@inject Microsoft.Extensions.Options.IOptions<UserAdminLib.Configuration.UserAdminOptions> options
+﻿@using UserAdminLib
+@using UserAdminLib.ViewModels
+@addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers@using Microsoft.AspNetCore.Identity
+@inject Microsoft.Extensions.Options.IOptions<UserAdminLib.Configuration.UserAdminOptions> options
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -18,7 +21,7 @@
                     <span class="navbar-toggler-icon"></span>
                 </button>
                 <div class="navbar-collapse collapse d-sm-inline-flex flex-sm-row-reverse">
-                    <partial name="_LoginPartial" />
+                    @await Html.PartialAsync("_LoginPartial")
                 </div>
             </div>
         </nav>

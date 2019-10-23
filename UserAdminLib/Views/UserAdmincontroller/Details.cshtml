@@ -1,5 +1,7 @@
-﻿@inject Microsoft.Extensions.Options.IOptions<UserAdminLib.Configuration.UserAdminOptions> options
-@model RolesWithData<UserInfo>
+﻿@model UserAdminLib.ViewModels.RolesWithData<UserAdminLib.ViewModels.UserInfo>
+@using UserAdminLib
+@addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
+@inject Microsoft.Extensions.Options.IOptions<UserAdminLib.Configuration.UserAdminOptions> options
 @{
     ViewData["Title"] = "User details";
 }
@@ -8,9 +10,11 @@
     <link rel="stylesheet" href="@options.Value.wwwdir/css/site.css" />
     <script src="@options.Value.wwwdir/lib/jquery/dist/jquery.min.js"></script>
     <script src="@options.Value.wwwdir/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="~/lib/jquery-validation/dist/jquery.validate.min.js"></script>
+    <script src="~/lib/jquery-validation-unobtrusive/jquery.validate.unobtrusive.min.js"></script>
 }
 
-<div class="row boxit">
+<div class="row-md boxit">
     <div class="col-md-12">
         <form asp-action="Search" method="post">
             <label class="control-label">Search name/email:</label>
@@ -18,7 +22,7 @@
         </form>
     </div>
 </div>
-<div class="row boxit mt-3">
+<div class="row-md boxit mt-3">
     <div class="col-md-12">
         <table class='table table-striped'>
             <tr>
