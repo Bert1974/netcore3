@@ -8,16 +8,12 @@
 
   <ItemGroup>
     <PackageReference Include="BB74.RoleDb" Version="0.1.0" />
+    <PackageReference Include="BB74.UserAdminLib" Version="0.2.4" />
     <PackageReference Include="Microsoft.AspNetCore.Diagnostics.EntityFrameworkCore" Version="3.0.0" />
     <PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="3.0.0" />
     <PackageReference Include="Microsoft.AspNetCore.Identity.UI" Version="3.0.0" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="3.0.0" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="3.0.0" />
-  </ItemGroup>
-
-
-  <ItemGroup>
-    <ProjectReference Include="..\UserAdminLib\UserAdminLib.csproj" />
   </ItemGroup>
 
 </Project>

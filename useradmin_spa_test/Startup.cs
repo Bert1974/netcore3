@@ -49,8 +49,9 @@ namespace useradmin
                     options.MinimumSameSitePolicy = SameSiteMode.None;
                     options.ConsentCookie.Name = "Cookie";
                 });*/
-            services.Configure<UserAdminLib.Configuration.UserAdminOptions>(_opt =>
+            services.Configure<UserAdminLib.Configuration.UserAdminOptions>(options =>
                 {
+                    options.wwwdir = "/Identity";
                 });
 
             //    var test1 =services.Where(_d => _d.ServiceType == typeof(UserManager<ApplicationUser>) || _d.ImplementationType == typeof(UserManager<ApplicationUser>)).ToArray();
@@ -127,7 +128,7 @@ namespace useradmin
 
             app.UseIdentityServer();
 
-            app.UseUseradmin(); // adds static files
+     //       app.UseUseradmin(); // adds static files, using through options.wwwdir
 
             app.UseEndpoints(endpoints =>
             {
