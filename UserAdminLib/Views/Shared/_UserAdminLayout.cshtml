@@ -1,11 +1,12 @@
-﻿<!DOCTYPE html>
+﻿@inject Microsoft.Extensions.Options.IOptions<UserAdminLib.Configuration.UserAdminOptions> options
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>@ViewData["Title"] - User administration</title>
-    <link rel="stylesheet" href="/useradmin/lib/bootstrap/dist/css/bootstrap.min.css" />
-    <link rel="stylesheet" href="/useradmin/css/site.css" />
+    <link rel="stylesheet" href="@options.Value.wwwdir/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="@options.Value.wwwdir/css/site.css" />
 </head>
 <body>
     <header>
@@ -33,8 +34,8 @@
             &copy; 2019 - useradminlib - <a asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
         </div>
     </footer>
-    <script src="/useradmin/lib/jquery/dist/jquery.min.js"></script>
-    <script src="/useradmin/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>=
+    <script src="@options.Value.wwwdir/lib/jquery/dist/jquery.min.js"></script>
+    <script src="@options.Value.wwwdir/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>=
     @RenderSection("Scripts", required: false)
 </body>
 </html>

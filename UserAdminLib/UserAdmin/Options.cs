@@ -17,6 +17,8 @@ namespace UserAdminLib.Configuration
         /// URL the user administration library will be available under
         /// </summary>
         public string Url { get; set; } = "UserAdmin";
+
+        public string wwwdir { get; set; } = "/useradmin";
     }
     #endregion
 

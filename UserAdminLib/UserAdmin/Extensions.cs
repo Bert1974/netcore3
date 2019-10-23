@@ -4,15 +4,14 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.AspNetCore.Mvc.ApplicationParts;
 using Microsoft.AspNetCore.Mvc.Controllers;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.FileProviders;
 using Microsoft.Extensions.Options;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Security.Claims;
@@ -110,7 +109,7 @@ namespace UserAdminLib
             {
                 var roles = services.GetRequiredService<RoleManager<TRole>>();
 
-                if (await roles.FindByNameAsync(Constants.Role) ==null)
+                if (await roles.FindByNameAsync(Constants.Role) == null)
                 {
                     var role = (TRole)Activator.CreateInstance(typeof(TRole), new object[] { Constants.Role });
                     await roles.CreateAsync(role);
@@ -145,7 +144,7 @@ namespace UserAdminLib
             where TUser : IdentityUser<string>
             where TRole : IdentityRole<string>
         {
-            var p= new UseradminControllerFeatureProvider<TUser, TRole, TContext>();
+            var p = new UseradminControllerFeatureProvider<TUser, TRole, TContext>();
             GenericControllerNameConvention.RegisterController(p.Type);
             return builder.ConfigureApplicationPartManager(apm => apm.FeatureProviders.Add(p));
         }
@@ -185,9 +184,9 @@ namespace UserAdminLib
                     {
                         policy.AuthenticationSchemes.Add(Constants.Scheme);
                         policy.RequireAuthenticatedUser();
-                     //   policy.RequireRole(Constants.Role);
+                        //   policy.RequireRole(Constants.Role);
 
-                            configurefunc?.Invoke(policy);
+                        configurefunc?.Invoke(policy);
                     });
             });
         }
@@ -204,7 +203,7 @@ namespace UserAdminLib
 
             app.UseStaticFiles(new StaticFileOptions
             {
-                FileProvider = new ManifestEmbeddedFileProvider(typeof(UserAdminExtensions).Assembly, "wwwroot"),
+                FileProvider = new ZipFileSystem(new MemoryStream(UserAdminLib.Properties.Resources.www), "wwwroot"),// new ManifestEmbeddedFileProvider(typeof(UserAdminExtensions).Assembly, "wwwroot"),
                 RequestPath = "/useradmin"
             });
             return app;
@@ -226,7 +225,7 @@ namespace UserAdminLib
         /// <typeparam name="TUser"></typeparam>
         /// <param name="builder"></param>
         /// <returns></returns>
-        public static IdentityBuilder RegisterUserAdminClaims<TUser,TRole>(this IdentityBuilder builder)
+        public static IdentityBuilder RegisterUserAdminClaims<TUser, TRole>(this IdentityBuilder builder)
             where TUser : IdentityUser<string>
             where TRole : IdentityRole<string>
         {
@@ -257,7 +256,7 @@ namespace UserAdminLib
         }
         public static bool IsDerived(this Type type, Type tofind)
         {
-            for (; type != null && type!= tofind&& type.GetGenericTypeDefinition() != tofind; type = type.BaseType) { }
+            for (; type != null && type != tofind && type.GetGenericTypeDefinition() != tofind; type = type.BaseType) { }
             return type != null;
         }
     }

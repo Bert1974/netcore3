@@ -1,12 +1,13 @@
-﻿@model RolesWithData<UserInfo>
+﻿@inject Microsoft.Extensions.Options.IOptions<UserAdminLib.Configuration.UserAdminOptions> options
+@model RolesWithData<UserInfo>
 @{
     ViewData["Title"] = "User details";
 }
 @section Scripts {
-    <link rel="stylesheet" href="/useradmin/lib/bootstrap/dist/css/bootstrap.min.css" />
-    <link rel="stylesheet" href="/useradmin/css/site.css" />
-    <script src="/useradmin/lib/jquery/dist/jquery.min.js"></script>
-    <script src="/useradmin/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    <link rel="stylesheet" href="@options.Value.wwwdir/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="@options.Value.wwwdir/css/site.css" />
+    <script src="@options.Value.wwwdir/lib/jquery/dist/jquery.min.js"></script>
+    <script src="@options.Value.wwwdir/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
 }
 
 <div class="row boxit">
