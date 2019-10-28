@@ -195,17 +195,20 @@ namespace UserAdminLib
         /// </summary>
         /// <param name="app"></param>
         /// <returns></returns>
-        public static IApplicationBuilder UseUseradmin(this IApplicationBuilder app)
+        public static IApplicationBuilder UseUseradmin(this IApplicationBuilder app, bool addfiles = true)
         {
             var options = app.ApplicationServices.GetRequiredService<IOptions<UserAdminLib.Configuration.UserAdminOptions>>();
 
             GenericControllerNameConvention.SetURL(null, options.Value.Url);
 
-            app.UseStaticFiles(new StaticFileOptions
+            if (addfiles)
             {
-                FileProvider = new ZipFileSystem(new MemoryStream(UserAdminLib.Properties.Resources.www), "wwwroot"),// new ManifestEmbeddedFileProvider(typeof(UserAdminExtensions).Assembly, "wwwroot"),
-                RequestPath = "/useradmin"
-            });
+                app.UseStaticFiles(new StaticFileOptions
+                {
+                    FileProvider = new ZipFileSystem(new MemoryStream(UserAdminLib.Properties.Resources.www), "wwwroot"),// new ManifestEmbeddedFileProvider(typeof(UserAdminExtensions).Assembly, "wwwroot"),
+                    RequestPath = "/useradmin"
+                });
+            }
             return app;
         }
         /// <summary>

@@ -295,8 +295,14 @@ namespace UserAdminLib.Controllers
 
             result.Roles = (await _users.GetRolesAsync(u)).OrderBy(_r => _r).ToArray();
 
-            result.RoleHandlers = result.Roles.Select(_r => _info.Get(_roles.NormalizeKey(_r))).Where(_h => _h != null).ToArray();
-
+            if (_info != null)
+            {
+                result.RoleHandlers = result.Roles.Select(_r => _info.Get(_roles.NormalizeKey(_r))).Where(_h => _h != null).ToArray();
+            }
+            else
+            {
+                result.RoleHandlers = new Roles.IRoleHandler[0];
+            }
             return result;
         }
 #pragma warning disable CS1998 // Async method lacks 'await' operators and will run synchronously
